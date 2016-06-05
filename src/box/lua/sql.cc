@@ -1275,7 +1275,6 @@ insert_new_view_as_space(Table *table, char *crt_stmt) {
 	int id_max = get_max_id_of_space();
 	id_max = MAX(id_max, BOX_SYSTEM_ID_MAX + 1);
 	int rc;
-	sqlite3 *db;
 	if (id_max < 0) {
 		say_debug("%s(): error while getting max id\n", __func_name);
 		return -1;
@@ -1285,9 +1284,6 @@ insert_new_view_as_space(Table *table, char *crt_stmt) {
 	msg_data = make_msgpuck_from((const Table *)table, msg_size, crt_stmt);
 	rc = box_insert(BOX_SPACE_ID, msg_data, msg_data + msg_size, NULL);
 	delete[] msg_data;
-	if (rc) {
-		db = get_global_db();
-	}
 	return rc;
 }
 
@@ -1592,7 +1588,7 @@ get_trntl_index_from_tuple(box_tuple_t *index_tpl, sqlite3 *db, Table *table, bo
 		}
 		table = (Table *)sqlite3HashFind(&pSchema->tblHash, space_name.GetStr());
 		if (!table) {
-			say_debug("%s(): space with id %llu was not found\n", __func_name, space_id.GetUint64());
+		  say_debug("%s(): space with id %llu was not found\n", __func_name, (unsigned long long)space_id.GetUint64());
 			return NULL;
 		}
 	}

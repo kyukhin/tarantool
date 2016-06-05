@@ -32,7 +32,7 @@
 #include "sql_tarantool_cursor.h"
 #include "space_iterator.h"
 
-int GetSerialTypeNum(u64 number) {
+int GetSerialTypeNum(uint64_t number) {
 	if (number == 0) return 8;
 	if (number == 1) return 9;
 	Mem mem;
@@ -46,8 +46,8 @@ int GetSerialTypeNum(double) {
 	return 7;
 }
 
-int GetSerialTypeNum(i64 number) {
-	u64 tmp;
+int GetSerialTypeNum(int64_t number) {
+	uint64_t tmp;
 	memcpy(&tmp, &number, sizeof(u64));
 	return GetSerialTypeNum(tmp);
 }
@@ -60,7 +60,7 @@ int GetSerialTypeBin(size_t len) {
 	return 2 * len + 12;
 }
 
-int PutVarintDataNum(unsigned char *data, u64 n) {
+int PutVarintDataNum(unsigned char *data, uint64_t n) {
 	int st = GetSerialTypeNum(n);
 	if ((st == 8) || (st == 9)) {
 		return 0;
@@ -72,8 +72,8 @@ int PutVarintDataNum(unsigned char *data, u64 n) {
 	return sqlite3VdbeSerialPut(data, &mem, st);
 }
 
-int PutVarintDataNum(unsigned char *data, i64 n) {
-	u64 tmp;
+int PutVarintDataNum(unsigned char *data, int64_t n) {
+	uint64_t tmp;
 	memcpy(&tmp, &n, sizeof(u64));
 	return PutVarintDataNum(data, tmp);
 }
@@ -86,14 +86,14 @@ int PutVarintDataNum(unsigned char *data, double n) {
 	return sqlite3VdbeSerialPut(data, &tmp, GetSerialTypeNum(n));
 }
 
-int DataVarintLenNum(u64 number) {
+int DataVarintLenNum(uint64_t number) {
 	if ((number == 0) || (number == 1)) return 0;
 	int st = GetSerialTypeNum(number);
 	return sqlite3VdbeSerialTypeLen(st);
 }
 
-int DataVarintLenNum(i64 number) {
-	u64 tmp;
+int DataVarintLenNum(int64_t number) {
+	uint64_t tmp;
 	memcpy(&tmp, &number, sizeof(u64));
 	return DataVarintLenNum(tmp);
 }
@@ -139,7 +139,7 @@ bool TarantoolCursor::make_btree_cell_from_tuple() {
 				break;
 			}
 			case MP_UINT: {
-				serial_types[i] = GetSerialTypeNum(val->GetUint64());
+			  serial_types[i] = GetSerialTypeNum(val->GetUint64());
 				header_size += sqlite3VarintLen(serial_types[i]);
 				data_size += DataVarintLenNum(val->GetUint64());
 				break;
@@ -153,7 +153,7 @@ bool TarantoolCursor::make_btree_cell_from_tuple() {
 				break;
 			}
 			case MP_INT: {
-				serial_types[i] = GetSerialTypeNum(val->GetInt64());
+			  serial_types[i] = GetSerialTypeNum(val->GetInt64());
 				header_size += sqlite3VarintLen(serial_types[i]);
 				data_size += DataVarintLenNum(val->GetInt64());
 				break;
@@ -167,7 +167,7 @@ bool TarantoolCursor::make_btree_cell_from_tuple() {
 				break;
 			}
 			case MP_BOOL: {
-				u64 tmp = (val->GetBool()) ? 1 : 0;
+				uint64_t tmp = (val->GetBool()) ? 1 : 0;
 				serial_types[i] = GetSerialTypeNum(tmp);
 				header_size += sqlite3VarintLen(serial_types[i]);
 				data_size += DataVarintLenNum(tmp);
@@ -222,7 +222,7 @@ bool TarantoolCursor::make_btree_cell_from_tuple() {
 				break;
 			}
 			case MP_BOOL: {
-				u64 tmp = (val->GetBool()) ? 1 : 0;
+				uint64_t tmp = (val->GetBool()) ? 1 : 0;
 				offset += PutVarintDataNum((unsigned char *)data + offset, tmp);
 				break;
 			}
@@ -320,7 +320,7 @@ bool TarantoolCursor::make_btree_key_from_tuple() {
 				break;
 			}
 			case MP_BOOL: {
-				u64 tmp = (val->GetBool()) ? 1 : 0;
+				uint64_t tmp = (val->GetBool()) ? 1 : 0;
 				serial_types[i] = GetSerialTypeNum(tmp);
 				header_size += sqlite3VarintLen(serial_types[i]);
 				data_size += DataVarintLenNum(tmp);
@@ -375,7 +375,7 @@ bool TarantoolCursor::make_btree_key_from_tuple() {
 				break;
 			}
 			case MP_BOOL: {
-				u64 tmp = (val->GetBool()) ? 1 : 0;
+				uint64_t tmp = (val->GetBool()) ? 1 : 0;
 				offset += PutVarintDataNum((unsigned char *)data + offset, tmp);
 				break;
 			}
