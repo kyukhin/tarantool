@@ -1588,7 +1588,7 @@ get_trntl_index_from_tuple(box_tuple_t *index_tpl, sqlite3 *db, Table *table, bo
 		}
 		table = (Table *)sqlite3HashFind(&pSchema->tblHash, space_name.GetStr());
 		if (!table) {
-		  say_debug("%s(): space with id %llu was not found\n", __func_name, (unsigned long long)space_id.GetUint64());
+			say_debug("%s(): space with id %llu was not found\n", __func_name, (unsigned long long)space_id.GetUint64());
 			return NULL;
 		}
 	}
